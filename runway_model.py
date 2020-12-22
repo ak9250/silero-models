@@ -20,20 +20,6 @@ def wav_to_text(f='test.wav'):
   output = model(input)
   return decoder(output[0].cpu())
 
-models = OmegaConf.load('models.yml')
-
-device = torch.device('cuda')   # you can use any pytorch device
-model, decoder = init_jit_model(models.stt_models.en.latest.jit, device=device)
-
-#@markdown { run: "auto" }
-
-language = "English" #@param ["English", "German", "Spanish"]
-
-#@markdown { run: "auto" }
-
-use_VAD = "Yes" #@param ["Yes", "No"]
-
-#@markdown Either record audio from microphone or upload audio from file (.mp3 or .wav) { run: "auto" }
 
 
 def _apply_vad(audio, boot_time=0, trigger_level=9, **kwargs):
@@ -57,26 +43,22 @@ def _recognize(audio):
 @runway.setup(options={'checkpoint': runway.file(extension='.model',description='checkpoint file')})
 def setup(opts):
     models = OmegaConf.load('models.yml')
+    device = torch.device('cuda')   
+    model, decoder = init_jit_model(opts['checkpoint'], device=device)
+    language = "English" 
 
-    device = torch.device('cuda')   # you can use any pytorch device
-    model, decoder = init_jit_model(models.stt_models.en.latest.jit, device=device)
-
-    language = "English" #@param ["English", "German", "Spanish"]
-
-    use_VAD = "Yes" #@param ["Yes", "No"]
+    use_VAD = "Yes" 
 
     return model, decoder
 
 
 @runway.command('translate', inputs={'source_audio': runway.file(extension='.wav', description='input sound file to be translated'),}, outputs={'text': runway.text(description='output text')})
 def translate(model, inputs):
-    test_files = glob(inputs['source_audio'])  # replace with your data
+    test_files = glob(inputs['source_audio'])  
     batches = split_into_batches(test_files, batch_size=10)
-    # transcribe a set of files
     input = prepare_model_input(read_batch(random.sample(batches, k=1)[0]),
                             device=device)
     output = model(input)
-    # for example in output:
     return decoder(example.cpu())
 
 
