@@ -32,10 +32,9 @@ def wav_to_text(f='test.wav'):
   output = model(input)
   return decoder(output[0].cpu())
 
-device = torch.device('cpu')   # you can use any pytorch device
 models = OmegaConf.load('models.yml')
 
-device = torch.device('cpu')   # you can use any pytorch device
+device = torch.device('gpu')   # you can use any pytorch device
 model, decoder = init_jit_model(models.stt_models.en.latest.jit, device=device)
 
 #@markdown { run: "auto" }
@@ -48,9 +47,6 @@ use_VAD = "Yes" #@param ["Yes", "No"]
 
 #@markdown Either record audio from microphone or upload audio from file (.mp3 or .wav) { run: "auto" }
 
-record_or_upload = "Record" #@param ["Record", "Upload (.mp3 or .wav)"]
-record_seconds =   4#@param {type:"number", min:1, max:10, step:1}
-sample_rate = 16000
 
 def _apply_vad(audio, boot_time=0, trigger_level=9, **kwargs):
   print('\nVAD applied\n')
