@@ -10,21 +10,9 @@ from glob import glob
 from omegaconf import OmegaConf
 from utils import (init_jit_model, 
                    split_into_batches,
-                   read_batch,
-                   prepare_model_input)
-from IPython.display import display, Audio
-import torch
-import random
-from glob import glob
-from omegaconf import OmegaConf
-from utils import (init_jit_model, 
-                   split_into_batches,
                    read_audio,
                    read_batch,
                    prepare_model_input)
-from colab_utils import (record_audio,
-                         audio_bytes_to_np,
-                         upload_audio)
 
 def wav_to_text(f='test.wav'):
   batch = read_batch([f])
