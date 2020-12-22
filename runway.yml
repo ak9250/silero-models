@@ -6,5 +6,5 @@ spec:
   cpu: False
 build_steps:
   - apt update
-  - apt-get install libsndfile1
+  - apt-get install libsndfile1 -y
   - pip install --ignore-installed PyYAML torchaudio omegaconf soundfile runway-python torch torchvision
