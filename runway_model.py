@@ -54,15 +54,22 @@ def _recognize(audio):
   print(transcription)
 
 
-@runway.setup(options={'checkpoint': runway.file(extension='.pkl',description='checkpoint file')})
+@runway.setup(options={'checkpoint': runway.file(extension='.model',description='checkpoint file')})
 def setup(opts):
-    path = Path(".")
-    learn=load_learner(path, opts['checkpoint'])
-    return learn
+    models = OmegaConf.load('models.yml')
+
+    device = torch.device('cuda')   # you can use any pytorch device
+    model, decoder = init_jit_model(models.stt_models.en.latest.jit, device=device)
+
+    language = "English" #@param ["English", "German", "Spanish"]
+
+    use_VAD = "Yes" #@param ["Yes", "No"]
+
+    return model, decoder
 
 
-@runway.command('translate', inputs={'source_audio': runway.file(description='input image to be translated'),}, outputs={'image': runway.text(description='output text')})
-def translate(learn, inputs):
+@runway.command('translate', inputs={'source_audio': runway.file(extension='.wav', description='input sound file to be translated'),}, outputs={'text': runway.text(description='output text')})
+def translate(model, inputs):
     test_files = glob(inputs['source_audio'])  # replace with your data
     batches = split_into_batches(test_files, batch_size=10)
     # transcribe a set of files
