@@ -22,7 +22,7 @@ def wav_to_text(f='test.wav'):
 
 models = OmegaConf.load('models.yml')
 
-device = torch.device('gpu')   # you can use any pytorch device
+device = torch.device('cuda')   # you can use any pytorch device
 model, decoder = init_jit_model(models.stt_models.en.latest.jit, device=device)
 
 #@markdown { run: "auto" }
